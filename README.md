@@ -1,6 +1,6 @@
 # BreachZero — Çoklu Oyunculu Pixel-Art SOC Triyaj Simülasyon Oyunu
 
-> **"Papers, Please" × "Overcooked"** estetiğinde; üniversite siber güvenlik kulübü bünyesinde 1. sınıftan 4. sınıfa farklı deneyim seviyelerindeki öğrencilerin birbirini bloklamadan geliştirebileceği, gerçek zamanlı ve açık kaynaklı **SOC War Room** simülasyonu.
+> **"Papers, Please" × "Overcooked"** estetiğinde; üniversite siber güvenlik kulübü bünyesinde 1. sınıftan 4. sınıfa farklı deneyim seviyelerindeki öğrencilerin konu ve zorluk bazlı görevlerle birbirini bloklamadan geliştirebileceği, gerçek zamanlı ve açık kaynaklı **SOC War Room** simülasyonu.
 
 ---
 
@@ -33,7 +33,9 @@ BreachZero/
 │   ├── GDD.md                    # Oyun tasarımı, ekranlar, puanlama ve anti-exploit dengesi
 │   ├── ARCHITECTURE.md           # FastAPI RoomManager, anti-cheat ve Cache-First mimarisi
 │   ├── CONTRACTS.md              # OCSF/ECS Alert, ScenarioFile, WebSocket ve BaseEnricher kontratları
-│   ├── CONTRIBUTING_TEAMS.md     # 4 kulüp ekibi için görev dağılımı ve 6 haftalık sprint planı
+│   ├── CONTRIBUTING_TEAMS.md     # Konu & zorluk bazlı katkı alanları ve PR kuralları
+│   ├── LEARNING_HANDBOOK.md      # SOC Triyaj 101, 5 güvenlik/sistem kavramı ve Git/CI rehberi
+│   ├── OPEN_SOURCE_DATASETS.md   # Sigma/Mordor/abuse.ch kaynakları, Event ID tablosu ve IOC rehberi
 │   ├── pixel-showcase.html       # Kilitli canlı UI stil vitrini (6 etkileşimli bölüm)
 │   └── assets/sprites/           # 16x16 JSON kaynakları ve 128x128 NEAREST PNG varlıkları
 ├── scenarios/                    # Kod gerektirmeyen bağımsız JSON senaryo paketleri
@@ -97,4 +99,6 @@ npm run dev -- --host
 | [`docs/GDD.md`](./docs/GDD.md) | Oyun döngüsü, Breach Meter, puanlama matematiği, V1/V2 kapsamı | Tüm ekipler & oyun tasarımcıları |
 | [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | `RoomManager`, disconnect/F5, anti-cheat sınırları, Cache-First | Core & Backend ekipleri |
 | [`docs/CONTRACTS.md`](./docs/CONTRACTS.md) | Dondurulmuş JSON şemaları, WebSocket mesajları, `BaseEnricher` | Tüm geliştirici ekipler |
-| [`docs/CONTRIBUTING_TEAMS.md`](./docs/CONTRIBUTING_TEAMS.md) | 4 bağımsız ekip yapısı, PR kuralları, 6 haftalık yol haritası | Kulüp koordinatörleri & yeni üyeler |
+| [`docs/CONTRIBUTING_TEAMS.md`](./docs/CONTRIBUTING_TEAMS.md) | Çalışma alanları, etiket sistemi, PR kuralları ve yol haritası | Tüm katılımcılar & yeni üyeler |
+| [`docs/LEARNING_HANDBOOK.md`](./docs/LEARNING_HANDBOOK.md) | SOC Triyaj 101, kod tabanındaki 5 güvenlik kavramı, ilk PR & CI rehberi | Projeye katılan tüm öğrenciler |
+| [`docs/OPEN_SOURCE_DATASETS.md`](./docs/OPEN_SOURCE_DATASETS.md) | Sigma, Mordor, ThreatFox/MalwareBazaar rehberi & kritik Event ID tablosu | Senaryo ve Enricher geliştiricileri |
