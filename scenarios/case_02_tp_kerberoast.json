@@ -1,0 +1,121 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "pack_id": "soc_fundamentals_v1",
+    "difficulty": "HARD",
+    "estimated_wave": 2,
+    "author": "kulup-senaryo-ekibi"
+  },
+  "public_alert": {
+    "alert_id": "case_02_tp_kerberoast",
+    "incident_code": "ALT-4088",
+    "title": "Stajyer İstasyonundan Kerberoasting TGS Patlaması ve Dış C2 Sinyali",
+    "severity": "CRITICAL",
+    "timestamp_utc": "2026-11-25T11:42:08Z",
+    "sla_seconds": 75,
+    "source": {
+      "ip": "10.10.22.45",
+      "port": 59310,
+      "hostname": "WKSTN-STAJYER-04",
+      "vlan": "VLAN-10-WORKSTATION"
+    },
+    "destination": {
+      "ip": "185.220.101.44",
+      "port": 4444,
+      "hostname": "AD-DC-01 / 185.220.101.44",
+      "vlan": "EXTERNAL-WAN"
+    },
+    "host": {
+      "hostname": "WKSTN-STAJYER-04",
+      "os": "Windows 11 Pro"
+    },
+    "user": {
+      "name": "e.demir_stajyer",
+      "department": "Yazılım Stajyeri"
+    },
+    "process": {
+      "name": "svchost_upd.exe",
+      "parent_name": "powershell.exe",
+      "command_line": "C:\\Users\\e.demir_stajyer\\AppData\\Local\\Temp\\svchost_upd.exe --roast-rc4 --c2 185.220.101.44:4444"
+    },
+    "file": {
+      "name": "svchost_upd.exe",
+      "sha256": "7f9c2e41b8a0d19e3c4412a87b6f9d22441188aa00ccddeeff1122334455e09a"
+    },
+    "raw_log": "2026-11-25T11:42:08Z AD-DC-01 WinEvent[4769]: 38x RC4(0x17) TGS requests from 10.10.22.45 (e.demir_stajyer) + Outbound Beacon FIN-SRV-04/WKSTN -> 185.220.101.44:4444",
+    "indicators": {
+      "ips": ["10.10.22.45", "185.220.101.44"],
+      "hashes": ["7f9c2e41b8a0d19e3c4412a87b6f9d22441188aa00ccddeeff1122334455e09a"],
+      "domains": [],
+      "usernames": ["e.demir_stajyer"],
+      "hostnames": ["WKSTN-STAJYER-04", "AD-DC-01"]
+    },
+    "available_enrichers": ["ip_reputation", "hash_vt", "internal_cmdb", "whois"]
+  },
+  "server_only": {
+    "ground_truth": "TP",
+    "hp_penalty_on_miss": 40,
+    "mitre_attack": ["T1558.003", "T1071.001"],
+    "category": "credential_access_c2",
+    "required_evidence_hints": ["internal_cmdb", "ip_reputation", "hash_vt"],
+    "debrief_explanation": "Stajyer kullanıcısı e.demir_stajyer normalde Active Directory servis hesapları için toplu RC4 (0x17) TGS bileti talep etmemelidir (T1558.003 Kerberoasting). Çalıştırılan svchost_upd.exe AppData\\Temp altından başlatılmış zararlı bir ikili dosyadır (VirusTotal 47/72) ve %98 kötücül C2 IP'si 185.220.101.44:4444 ile iletişim kurmaktadır (T1071.001). Kritik kimlik bilgisi sızıntısı riski nedeniyle TRUE POSITIVE olarak eskale edilmelidir.",
+    "mock_enrichment": {
+      "ip_reputation": {
+        "enricher_id": "ip_reputation",
+        "display_name": "IP İtibar",
+        "icon_id": "tool-ip-radar",
+        "status": "OK",
+        "verdict_signal": "MALICIOUS",
+        "summary": "185.220.101.44 → AbuseIPDB %98 Kötücül; aktif Sliver/CobaltStrike C2 çıkış düğümü olarak işaretli.",
+        "details": {
+          "abuse_confidence": 98,
+          "reports_last_30d": 412,
+          "threat_category": "C2 / Botnet Controller"
+        },
+        "source_mode": "mock"
+      },
+      "hash_vt": {
+        "enricher_id": "hash_vt",
+        "display_name": "Hash / VT",
+        "icon_id": "tool-hash-scanner",
+        "status": "OK",
+        "verdict_signal": "MALICIOUS",
+        "summary": "svchost_upd.exe → VirusTotal 47/72 Motor (Trojan.Kerberoast / Backdoor.Sliver); dijital imza yok.",
+        "details": {
+          "detections": "47/72",
+          "malware_family": "KerberoastLoader",
+          "signed": false
+        },
+        "source_mode": "mock"
+      },
+      "internal_cmdb": {
+        "enricher_id": "internal_cmdb",
+        "display_name": "İç CMDB",
+        "icon_id": "tool-cmdb-server",
+        "status": "OK",
+        "verdict_signal": "SUSPICIOUS",
+        "summary": "e.demir_stajyer yalnızca kısıtlı geliştirici erişimine sahip; AD-DC-01 üzerinde servis bileti taraması veya dış 4444/TCP izni yok.",
+        "details": {
+          "employee_role": "Yazılım Stajyeri (Kısıtlı Yetki)",
+          "authorized_admin_tools": false,
+          "target_asset_criticality": "Tier-0 Domain Controller (AD-DC-01)"
+        },
+        "source_mode": "mock"
+      },
+      "whois": {
+        "enricher_id": "whois",
+        "display_name": "WHOIS",
+        "icon_id": "fallback-globe",
+        "status": "OK",
+        "verdict_signal": "SUSPICIOUS",
+        "summary": "185.220.101.44 → Kurşun geçirmez (bulletproof) VPS sağlayıcısına kayıtlı anonim ASN (AS205100).",
+        "details": {
+          "asn": "AS205100",
+          "org": "Anonymous Offshore Hosting Ltd.",
+          "country": "DE"
+        },
+        "source_mode": "mock"
+      }
+    }
+  }
+}

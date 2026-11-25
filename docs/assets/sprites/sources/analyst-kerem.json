@@ -1,0 +1,35 @@
+{
+  "name": "SOC Analyst Kerem",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "B": "#232a4a",
+    "L": "#4b588a",
+    "P": "#171c33",
+    "A": "#ffb84d",
+    "K": "#9c6314",
+    "S": "#e8b48a",
+    "D": "#b57c52",
+    "H": "#2b1d14",
+    "C": "#38d9ff",
+    "W": "#e6ecff"
+  },
+  "grid": [
+    "...OOOOOOOOOO...",
+    "..OBLLLLLLLLBO..",
+    ".OBLBBBBBBBBLBO.",
+    ".OBOSSSSSSSSOBO.",
+    "OAKOSSSSSSSSOKAO",
+    "OAKOSOWSSOWSOKAO",
+    "OAKOSOCSSOCSOKAO",
+    "OAKOSSSSSSSSOKAO",
+    ".OBOHHSDDSHHOBO.",
+    "..OOHHHHHHHHOO..",
+    "..OBBHHHHHHBBO..",
+    ".OBBPPAPPAPPBBO.",
+    ".OBBPPAPPAPPBBO.",
+    ".OBBPPPPPPPPBBO.",
+    ".OBBPPPLLPPPBBO.",
+    "..OOOOOOOOOOOO.."
+  ]
+}

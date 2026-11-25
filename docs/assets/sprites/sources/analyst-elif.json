@@ -1,0 +1,35 @@
+{
+  "name": "SOC Analyst Elif",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "H": "#322449",
+    "h": "#4b588a",
+    "S": "#f1c27d",
+    "D": "#c68642",
+    "W": "#e6ecff",
+    "C": "#38d9ff",
+    "A": "#ffb84d",
+    "M": "#8b97c7",
+    "B": "#232a4a",
+    "P": "#171c33"
+  },
+  "grid": [
+    ".....OOOOOO.....",
+    "....OHHhHHHO....",
+    "...OOHHHHHHOO...",
+    "..OHHHHHHHHHHO..",
+    "..OHHSSSSSSHHO..",
+    "..OHSSSSSSSSHO..",
+    ".OMOSOWSSOWSOMO.",
+    ".OMOSOCSSOCSOMO.",
+    "..OOASSSDDSSOO..",
+    "...OOSSSSSSOO...",
+    "...OOBBSSBBOO...",
+    "..OBBPPWWPPBBO..",
+    ".OBBPPAAAAPPBBO.",
+    ".OBBPPPPPPPPBBO.",
+    ".OBBPPPMMPPPBBO.",
+    "..OOOOOOOOOOOO.."
+  ]
+}

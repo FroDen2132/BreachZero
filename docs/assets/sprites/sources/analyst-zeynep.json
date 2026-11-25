@@ -1,0 +1,36 @@
+{
+  "name": "SOC Analyst Zeynep",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "R": "#991636",
+    "r": "#ff3864",
+    "S": "#f7d5b1",
+    "D": "#d49b72",
+    "M": "#4b588a",
+    "C": "#38d9ff",
+    "W": "#e6ecff",
+    "G": "#2de370",
+    "g": "#157a3b",
+    "B": "#232a4a",
+    "P": "#171c33"
+  },
+  "grid": [
+    "....OOOOOOOO....",
+    "...ORRrRRRRRO...",
+    "..ORrRRRRRRrRO..",
+    "..ORRSSSSSSRRO..",
+    "..ORSSSSSSSSRO..",
+    "..ORMOWMMOWMRO..",
+    "..ORMCCSSCCMRO..",
+    "..ORSSSSSSSSRO..",
+    "..ORSSSDDSSSRO..",
+    "..OROSSSSSSORO..",
+    "..OROGGGGGGORO..",
+    "..OOBBGGGGBBOO..",
+    ".OBBPPPPPPPPBBO.",
+    ".OBBPPPGGPPPBBO.",
+    ".OBBPPPPPPPPBBO.",
+    "..OOOOOOOOOOOO.."
+  ]
+}

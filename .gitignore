@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+.pytest_cache/
+
+# Environment & local databases
+.env
+.env.*
+!.env.example
+data/
+data/*.db
+backend/data/*.db
+*.db
+*.sqlite
+
+# Node / Vite frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Local-only handoff & personal notes
+HANDOFF.local.md
+*.local.md
+
+# Playwright & E2E artifacts
+test-artifacts/
+frontend/playwright-report/
+frontend/test-results/

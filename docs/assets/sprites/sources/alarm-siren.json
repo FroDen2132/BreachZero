@@ -1,0 +1,32 @@
+{
+  "name": "Red Alarm Siren",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "A": "#ffb84d",
+    "R": "#ff3864",
+    "D": "#991636",
+    "W": "#e6ecff",
+    "L": "#8b97c7",
+    "M": "#4b588a",
+    "B": "#232a4a"
+  },
+  "grid": [
+    ".......AA.......",
+    "..AA........AA..",
+    "......OOOO......",
+    ".AA..ORRRRO..AA.",
+    "....ORWWWRRO....",
+    "....ORWRRRDO....",
+    "...ORRRRRRDDO...",
+    "...ORRRRRRDDO...",
+    "...ORRRRRRDDO...",
+    "...ORRRRRRDDO...",
+    "..OOOOOOOOOOOO..",
+    "..OLLLLLLLLMMO..",
+    "..OMMMMMMMMMMO..",
+    ".OOBBBBBBBBBBOO.",
+    ".OOMMMMMMMMMMOO.",
+    ".OOOOOOOOOOOOOO."
+  ]
+}

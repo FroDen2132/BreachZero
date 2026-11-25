@@ -1,0 +1,2156 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BREACHZERO // Pixel SOC UI Styleguide &amp; Canlı Vitrin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Pixelify+Sans:wght@400..700&family=Press+Start+2P&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-crt: #0c0f1d;
+      --bg-panel: #171c33;
+      --bg-card: #232a4a;
+      --border-light: #4b588a;
+      --border-shadow: #070912;
+      --text-primary: #e6ecff;
+      --text-secondary: #b2bfe8;
+      --safe: #2de370;
+      --safe-dark: #157a3b;
+      --threat: #ff3864;
+      --threat-dark: #991636;
+      --warn: #ffb84d;
+      --warn-dark: #9c6314;
+      --cyan: #38d9ff;
+
+      --font-display: 'Press Start 2P', monospace;
+      --font-tr: 'Pixelify Sans', monospace;
+      --font-log: 'IBM Plex Mono', 'JetBrains Mono', monospace;
+      --font-ui: 'Silkscreen', 'Pixelify Sans', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-crt);
+      color: var(--text-primary);
+      font-family: var(--font-tr);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+
+    img, canvas, .pixel-sprite {
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      display: block;
+    }
+
+    /* CRT Scanline Overlay (subtle 0.10 opacity, off by default for projector clarity) */
+    .crt-scanlines {
+      position: fixed;
+      inset: 0;
+      z-index: 999;
+      pointer-events: none;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        rgba(7, 9, 18, 0) 0px,
+        rgba(7, 9, 18, 0) 2px,
+        rgba(7, 9, 18, 0.10) 2px,
+        rgba(7, 9, 18, 0.10) 4px
+      );
+      opacity: 1;
+    }
+
+    body.scanlines-off .crt-scanlines {
+      display: none;
+    }
+
+    /* Discrete pixel animations */
+    @keyframes blink-step {
+      0%, 49% { opacity: 1; }
+      50%, 100% { opacity: 0.15; }
+    }
+
+    @keyframes pixel-shake {
+      0%   { transform: translate(0px, 0px); }
+      15%  { transform: translate(-8px, 4px); }
+      30%  { transform: translate(8px, -4px); }
+      45%  { transform: translate(-6px, -4px); }
+      60%  { transform: translate(6px, 4px); }
+      75%  { transform: translate(-4px, 2px); }
+      90%  { transform: translate(4px, -2px); }
+      100% { transform: translate(0px, 0px); }
+    }
+
+    @keyframes stamp-slam {
+      0%   { transform: rotate(-8deg) scale(1.65); opacity: 0.2; }
+      55%  { transform: rotate(-8deg) scale(0.92); opacity: 1; }
+      100% { transform: rotate(-8deg) scale(1); opacity: 1; }
+    }
+
+    .war-room-shell {
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 20px 18px 48px;
+    }
+
+    .war-room-shell.is-shaking {
+      animation: pixel-shake 360ms steps(6, end);
+    }
+
+    .war-room-shell.is-damage-flash {
+      outline: 4px solid var(--threat);
+      outline-offset: -4px;
+    }
+
+    /* Stepped Pixel Panels & Buttons */
+    .pixel-panel {
+      background-color: var(--bg-panel);
+      border: 4px solid var(--border-light);
+      box-shadow:
+        inset 4px 4px 0px var(--bg-card),
+        inset -4px -4px 0px var(--border-shadow),
+        6px 6px 0px var(--border-shadow);
+      padding: 18px;
+      margin-bottom: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-bottom: 12px;
+      margin-bottom: 16px;
+      border-bottom: 4px solid var(--border-shadow);
+      box-shadow: 0 2px 0 var(--border-light);
+    }
+
+    .section-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-tag {
+      font-family: var(--font-display);
+      font-size: 12px;
+      background-color: var(--bg-crt);
+      color: var(--cyan);
+      border: 2px solid var(--cyan);
+      padding: 6px 8px;
+      box-shadow: 2px 2px 0px var(--border-shadow);
+      flex-shrink: 0;
+    }
+
+    .section-title {
+      margin: 0;
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 22px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      text-shadow: 2px 2px 0px var(--border-shadow);
+    }
+
+    .section-sub {
+      margin: 4px 0 0;
+      font-family: var(--font-tr);
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    /* Pixel Buttons */
+    .px-btn {
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-primary);
+      background-color: var(--bg-card);
+      border: 3px solid var(--border-light);
+      padding: 10px 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow:
+        inset 2px 2px 0px #5e6da8,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+      transition: none;
+      user-select: none;
+    }
+
+    .px-btn:hover {
+      background-color: #2c355c;
+      border-color: var(--text-primary);
+    }
+
+    .px-btn:active,
+    .px-btn.is-pressed {
+      transform: translate(4px, 4px);
+      box-shadow:
+        inset 2px 2px 0px var(--border-shadow),
+        0px 0px 0px var(--border-shadow);
+    }
+
+    .px-btn-cyan {
+      background-color: #13394c;
+      border-color: var(--cyan);
+      color: var(--cyan);
+      box-shadow:
+        inset 2px 2px 0px #66e4ff,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+    }
+
+    .px-btn-cyan:hover {
+      background-color: #1b4d66;
+      color: var(--text-primary);
+    }
+
+    .px-btn-amber {
+      background-color: var(--warn-dark);
+      border-color: var(--warn);
+      color: var(--text-primary);
+      box-shadow:
+        inset 2px 2px 0px #ffd285,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+    }
+
+    .px-btn-amber:hover {
+      background-color: #b87618;
+    }
+
+    .px-btn-safe {
+      background-color: var(--safe-dark);
+      border-color: var(--safe);
+      color: var(--text-primary);
+      box-shadow:
+        inset 2px 2px 0px #70f09f,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+    }
+
+    .px-btn-safe:hover {
+      background-color: #1b9649;
+    }
+
+    .px-btn-threat {
+      background-color: var(--threat-dark);
+      border-color: var(--threat);
+      color: var(--text-primary);
+      box-shadow:
+        inset 2px 2px 0px #ff7a98,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+    }
+
+    .px-btn-threat:hover {
+      background-color: #b81d43;
+    }
+
+    .px-btn-stamp {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 14px 18px;
+      border-width: 4px;
+      box-shadow:
+        inset 3px 3px 0px rgba(230, 236, 255, 0.35),
+        inset -3px -3px 0px var(--border-shadow),
+        6px 6px 0px var(--border-shadow);
+    }
+
+    .px-btn-stamp:active,
+    .px-btn-stamp.is-pressed {
+      transform: translate(6px, 6px);
+      box-shadow:
+        inset 3px 3px 0px var(--border-shadow),
+        0px 0px 0px var(--border-shadow);
+    }
+
+    /* Badges & LEDs */
+    .pixel-led {
+      width: 12px;
+      height: 12px;
+      display: inline-block;
+      border: 2px solid var(--border-shadow);
+      flex-shrink: 0;
+    }
+
+    .pixel-led-green { background-color: var(--safe); }
+    .pixel-led-amber { background-color: var(--warn); }
+    .pixel-led-red {
+      background-color: var(--threat);
+      animation: blink-step 650ms steps(2, end) infinite;
+    }
+
+    .pixel-badge {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      line-height: 1.15;
+      padding: 5px 10px;
+      border: 2px solid var(--border-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 2px 2px 0px var(--border-shadow);
+      text-transform: uppercase;
+    }
+
+    .badge-unclaimed {
+      background-color: var(--bg-crt);
+      color: var(--cyan);
+      border-color: var(--cyan);
+    }
+
+    .badge-claimed {
+      background-color: var(--warn);
+      color: var(--border-shadow);
+      border-color: var(--warn-dark);
+    }
+
+    .badge-critical {
+      background-color: var(--threat);
+      color: var(--text-primary);
+      border-color: var(--threat-dark);
+    }
+
+    /* 1. Top Control Bar */
+    .topbar-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .brand-block {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 24px;
+      color: var(--text-primary);
+      text-shadow: 4px 4px 0px var(--border-shadow);
+      letter-spacing: 1px;
+    }
+
+    .brand-title span {
+      color: var(--cyan);
+    }
+
+    .brand-sub {
+      margin: 6px 0 0;
+      font-family: var(--font-tr);
+      font-weight: 500;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .topbar-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .clock-box {
+      font-family: var(--font-display);
+      font-size: 12px;
+      background-color: var(--bg-crt);
+      border: 3px solid var(--border-light);
+      color: var(--safe);
+      padding: 10px 12px;
+      box-shadow: 3px 3px 0px var(--border-shadow);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .swatch-card {
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      box-shadow: 3px 3px 0px var(--border-shadow);
+      padding: 8px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      text-align: left;
+      color: var(--text-primary);
+    }
+
+    .swatch-card:hover {
+      border-color: var(--cyan);
+      background-color: var(--bg-card);
+    }
+
+    .swatch-card:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0px var(--border-shadow);
+    }
+
+    .swatch-chip {
+      width: 30px;
+      height: 30px;
+      border: 2px solid var(--border-shadow);
+      box-shadow: inset 2px 2px 0px rgba(255, 255, 255, 0.22);
+      flex-shrink: 0;
+    }
+
+    .swatch-meta {
+      min-width: 0;
+    }
+
+    .swatch-name {
+      display: block;
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .swatch-hex {
+      display: block;
+      font-family: var(--font-log);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    .typo-strip {
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .typo-sample-display {
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--warn);
+    }
+
+    .typo-sample-log {
+      font-family: var(--font-log);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+    }
+
+    .typo-sample-tr {
+      font-family: var(--font-tr);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--safe);
+    }
+
+    /* 2. Shared Alert Queue (3 States) */
+    .queue-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .alert-card {
+      background-color: var(--bg-card);
+      border: 4px solid var(--border-light);
+      box-shadow:
+        inset 2px 2px 0px #333d6b,
+        inset -2px -2px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 270px;
+    }
+
+    .alert-card.state-claimed {
+      border-color: var(--warn);
+    }
+
+    .alert-card.state-critical {
+      border-color: var(--threat);
+      background-color: #2b1528;
+    }
+
+    .alert-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .alert-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .alert-code {
+      font-family: var(--font-display);
+      font-size: 11px;
+      color: var(--cyan);
+    }
+
+    .alert-sep {
+      font-size: 15px;
+      color: var(--text-secondary);
+    }
+
+    .alert-severity {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .alert-title {
+      margin: 10px 0 0;
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .alert-log {
+      margin: 0;
+      font-family: var(--font-log);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-shadow);
+      padding: 10px 12px;
+    }
+
+    .alert-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 10px;
+      border-top: 2px solid var(--border-shadow);
+    }
+
+    .unassigned-label {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .assignee-chip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .assignee-name {
+      font-family: var(--font-tr);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--warn);
+    }
+
+    .assignee-role {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    /* Integer sprite scaling (16 x 3 = 48px inside 56px container) */
+    .avatar-box {
+      width: 56px;
+      height: 56px;
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      padding: 2px;
+      box-shadow: 2px 2px 0px var(--border-shadow);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .avatar-box img {
+      width: 48px;
+      height: 48px;
+    }
+
+    .sla-timer-box {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sla-label {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .sla-countdown {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--threat);
+      text-shadow: 2px 2px 0px var(--border-shadow);
+      margin-top: 2px;
+    }
+
+    /* 3. Interactive Stamp Desk */
+    .desk-layout {
+      display: grid;
+      grid-template-columns: 1.35fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .dossier-paper {
+      position: relative;
+      background-color: #12172b;
+      border: 4px solid var(--border-light);
+      box-shadow:
+        inset 4px 4px 0px #1e2647,
+        inset -4px -4px 0px var(--border-shadow),
+        6px 6px 0px var(--border-shadow);
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .dossier-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px dashed var(--border-light);
+      padding-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .dossier-heading {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dossier-label {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .dossier-code {
+      font-family: var(--font-display);
+      font-size: 12px;
+      color: var(--warn);
+    }
+
+    .dossier-log-box {
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      padding: 12px 14px;
+      font-family: var(--font-log);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-primary);
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dossier-kv {
+      color: var(--cyan);
+      font-weight: 600;
+    }
+
+    .evidence-terminal {
+      background-color: var(--border-shadow);
+      border: 2px solid var(--cyan);
+      padding: 12px 14px;
+      min-height: 160px;
+    }
+
+    .evidence-title {
+      font-family: var(--font-tr);
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--cyan);
+      margin: 0 0 8px;
+    }
+
+    .evidence-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-family: var(--font-log);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .evidence-item-empty {
+      color: var(--text-secondary);
+    }
+
+    .evidence-item-warn {
+      color: var(--warn);
+    }
+
+    .evidence-item-threat {
+      color: var(--threat);
+    }
+
+    .evidence-item-safe {
+      color: var(--safe);
+    }
+
+    /* Angled Pixel Seal Overlay */
+    .pixel-seal {
+      position: absolute;
+      top: 40%;
+      right: 22px;
+      z-index: 5;
+      padding: 12px 18px;
+      border: 4px solid currentColor;
+      outline: 2px solid var(--border-shadow);
+      box-shadow:
+        inset 0 0 0 3px var(--bg-crt),
+        4px 4px 0px var(--border-shadow);
+      background-color: rgba(12, 15, 29, 0.94);
+      font-family: var(--font-tr);
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      line-height: 1.25;
+      text-align: center;
+      transform: rotate(-8deg);
+      pointer-events: none;
+      display: none;
+    }
+
+    .pixel-seal.is-visible {
+      display: block;
+      animation: stamp-slam 200ms steps(3, end) forwards;
+    }
+
+    .pixel-seal.seal-fp {
+      color: var(--safe);
+    }
+
+    .pixel-seal.seal-tp {
+      color: var(--threat);
+    }
+
+    .desk-controls {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .enrichment-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .enrich-btn {
+      width: 100%;
+      justify-content: space-between;
+      padding: 10px 12px;
+    }
+
+    .enrich-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Integer sprite scaling (16 x 2 = 32px inside 40px container) */
+    .enrich-icon-box {
+      width: 40px;
+      height: 40px;
+      background-color: var(--bg-crt);
+      border: 2px solid var(--cyan);
+      padding: 2px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .enrich-icon-box img {
+      width: 32px;
+      height: 32px;
+    }
+
+    .enrich-status {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .enrich-btn.is-done .enrich-status {
+      color: var(--safe);
+    }
+
+    .stamp-pad {
+      background-color: var(--bg-crt);
+      border: 4px solid var(--border-light);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      box-shadow: 4px 4px 0px var(--border-shadow);
+    }
+
+    .stamp-pad-label {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+
+    /* 4. Breach Meter */
+    .breach-panel-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .breach-top-stats {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .breach-subtitle {
+      font-family: var(--font-tr);
+      font-size: 16px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .hp-readout {
+      font-family: var(--font-display);
+      font-size: 16px;
+      color: var(--safe);
+      text-shadow: 3px 3px 0px var(--border-shadow);
+    }
+
+    .hp-readout.is-warn { color: var(--warn); }
+    .hp-readout.is-threat { color: var(--threat); }
+
+    .breach-bar {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 6px;
+      background-color: var(--bg-crt);
+      border: 4px solid var(--border-light);
+      padding: 10px;
+      box-shadow:
+        inset 3px 3px 0px var(--border-shadow),
+        4px 4px 0px var(--border-shadow);
+    }
+
+    .breach-bar.is-critical {
+      border-color: var(--threat);
+    }
+
+    .hp-block {
+      height: 36px;
+      border: 2px solid var(--border-shadow);
+      background-color: var(--bg-panel);
+      box-shadow: inset 0 4px 0 rgba(7, 9, 18, 0.5);
+    }
+
+    .hp-block.active-safe {
+      background-color: var(--safe);
+      box-shadow:
+        inset 0 4px 0 #7df5a8,
+        inset 0 -4px 0 var(--safe-dark);
+    }
+
+    .hp-block.active-warn {
+      background-color: var(--warn);
+      box-shadow:
+        inset 0 4px 0 #ffda99,
+        inset 0 -4px 0 var(--warn-dark);
+    }
+
+    .hp-block.active-threat {
+      background-color: var(--threat);
+      box-shadow:
+        inset 0 4px 0 #ff87a2,
+        inset 0 -4px 0 var(--threat-dark);
+    }
+
+    .breach-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .breach-btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .breach-hint {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    /* 5. 16x16 Pixel Asset Gallery */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .sprite-card {
+      background-color: var(--bg-card);
+      border: 4px solid var(--border-light);
+      box-shadow: 4px 4px 0px var(--border-shadow);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 10px;
+    }
+
+    /* Integer sprite scaling (16 x 5 = 80px inside 96px container) */
+    .sprite-stage {
+      position: relative;
+      width: 96px;
+      height: 96px;
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-shadow);
+      box-shadow: inset 2px 2px 0px #070912;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sprite-stage img {
+      width: 80px;
+      height: 80px;
+    }
+
+    .pixel-grid-overlay {
+      position: absolute;
+      inset: 6px;
+      pointer-events: none;
+      display: none;
+      background-image:
+        linear-gradient(to right, rgba(56, 217, 255, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(56, 217, 255, 0.35) 1px, transparent 1px);
+      background-size: 5px 5px;
+    }
+
+    .gallery-grid.show-grid .pixel-grid-overlay {
+      display: block;
+    }
+
+    .sprite-name {
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .sprite-file {
+      font-family: var(--font-log);
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--cyan);
+    }
+
+    .svg-strip {
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
+    .svg-strip-label {
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .svg-strip-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .svg-demo-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--bg-panel);
+      border: 2px solid var(--border-light);
+      padding: 6px 12px;
+      font-family: var(--font-tr);
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    /* 6. Mini Projector Preview (/host) */
+    .host-projector {
+      background-color: var(--bg-crt);
+      border: 4px solid var(--cyan);
+      box-shadow:
+        inset 0 0 0 4px var(--bg-panel),
+        6px 6px 0px var(--border-shadow);
+      padding: 16px;
+    }
+
+    .host-banner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background-color: var(--bg-panel);
+      border: 3px solid var(--border-light);
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .host-title {
+      margin: 0;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .host-brand {
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .host-brand span {
+      color: var(--warn);
+    }
+
+    .host-sub {
+      font-family: var(--font-tr);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .teams-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 4px;
+    }
+
+    .team-card {
+      background-color: var(--bg-panel);
+      border: 4px solid var(--border-light);
+      box-shadow: 4px 4px 0px var(--border-shadow);
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .team-card.rank-1 {
+      border-color: var(--safe);
+    }
+
+    .team-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .team-identity {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .team-name {
+      margin: 0;
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 18px;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .team-hp-label {
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      display: inline-block;
+      margin-top: 2px;
+    }
+
+    .team-rank {
+      font-family: var(--font-display);
+      font-size: 12px;
+      padding: 6px 8px;
+      background-color: var(--bg-crt);
+      border: 2px solid var(--warn);
+      color: var(--warn);
+    }
+
+    .team-metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .metric-box {
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-shadow);
+      padding: 8px 10px;
+    }
+
+    .metric-label {
+      display: block;
+      font-family: var(--font-tr);
+      font-size: 15px;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--text-secondary);
+    }
+
+    .metric-value {
+      display: block;
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--cyan);
+      margin-top: 6px;
+    }
+
+    .mini-breach-bar {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+      gap: 3px;
+      background-color: var(--bg-crt);
+      border: 2px solid var(--border-light);
+      padding: 5px;
+    }
+
+    .mini-hp-block {
+      height: 16px;
+      border: 1px solid var(--border-shadow);
+      background-color: var(--bg-card);
+    }
+
+    .mini-hp-block.active-safe {
+      background-color: var(--safe);
+      box-shadow: inset 0 -2px 0 var(--safe-dark);
+    }
+
+    .mini-hp-block.active-warn {
+      background-color: var(--warn);
+      box-shadow: inset 0 -2px 0 var(--warn-dark);
+    }
+
+    .mini-hp-block.active-threat {
+      background-color: var(--threat);
+      box-shadow: inset 0 -2px 0 var(--threat-dark);
+    }
+
+    /* Pixel Toast */
+    .pixel-toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 1000;
+      background-color: var(--bg-panel);
+      border: 4px solid var(--safe);
+      color: var(--text-primary);
+      font-family: var(--font-tr);
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.04em;
+      padding: 10px 14px;
+      box-shadow: 4px 4px 0px var(--border-shadow);
+      display: none;
+    }
+
+    .pixel-toast.is-visible {
+      display: block;
+    }
+
+    @media (max-width: 1024px) {
+      .queue-grid,
+      .teams-grid,
+      .desk-layout {
+        grid-template-columns: 1fr;
+      }
+      .gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .gallery-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="scanlines-off">
+  <div class="crt-scanlines" aria-hidden="true"></div>
+
+  <main id="war-room-shell" class="war-room-shell">
+
+    <!-- 1. ÜST KONTROL BARI & KİLİTLİ RENK PALETİ -->
+    <section id="section-topbar" class="pixel-panel" aria-label="Üst Kontrol Barı">
+      <div class="topbar-header">
+        <div class="brand-block">
+          <div class="avatar-box" title="BREACHZERO War Room">
+            <img src="assets/sprites/alarm-siren.png" alt="BreachZero Alarm Sireni" class="pixel-sprite">
+          </div>
+          <div>
+            <h1 class="brand-title">BREACH<span>ZERO</span> // WAR ROOM UI</h1>
+            <p class="brand-sub">16-Bit Retro Cyber SOC Tasarım Sistemi • Papers, Please + Overcooked Estetiği</p>
+          </div>
+        </div>
+        <div class="topbar-controls">
+          <div class="clock-box" id="warroom-clock">
+            <span class="pixel-led pixel-led-green"></span>
+            <span id="clock-text">13:45:00</span>
+          </div>
+          <button type="button" id="btn-scanline" class="px-btn px-btn-cyan" aria-pressed="false">
+            <svg viewBox="0 0 24 24" width="20" height="20" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="2" fill="#38d9ff"/>
+              <rect x="2" y="6" width="2" height="10" fill="#38d9ff"/>
+              <rect x="20" y="6" width="2" height="10" fill="#38d9ff"/>
+              <rect x="2" y="16" width="20" height="2" fill="#38d9ff"/>
+              <rect x="6" y="10" width="12" height="2" fill="#38d9ff"/>
+              <rect x="8" y="19" width="8" height="2" fill="#38d9ff"/>
+            </svg>
+            <span id="scanline-label">CRT SCANLINE: KAPALI</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="palette-grid" id="palette-grid" aria-label="Kilitli Renk Paleti"></div>
+
+      <div class="typo-strip">
+        <span class="typo-sample-display">PRESS START 2P (12px) // BREACHZERO 00:25</span>
+        <span class="typo-sample-log">IBM Plex Mono (14px): 91.214.124.77 | SHA256: 7f9c2e41...e09a — Şifreli oturum incelendi</span>
+        <span class="typo-sample-tr">Pixelify Sans (16px): Ç Ğ İ Ö Ş Ü ç ğ ı ö ş ü</span>
+      </div>
+    </section>
+
+    <!-- 2. ORTAK ALARM KUYRUĞU (3 DURUM) -->
+    <section id="section-queue" class="pixel-panel" aria-label="Ortak Alarm Kuyruğu">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-tag">02</span>
+          <div>
+            <h2 class="section-title">Ortak Alarm Kuyruğu (3 Durum)</h2>
+            <p class="section-sub">Analistler aynı kuyruktan alarm üstlenir; SLA sayacı kritik eşikte alarm verir.</p>
+          </div>
+        </div>
+        <button type="button" id="btn-reset-queue" class="px-btn">Kuyruğu Sıfırla</button>
+      </div>
+
+      <div class="queue-grid" id="queue-grid">
+        <!-- Card 1: Unclaimed (interactive toggle) -->
+        <article class="alert-card" id="card-q1" data-claimed="false">
+          <div>
+            <div class="alert-top-row">
+              <span class="alert-meta">
+                <span class="alert-code">ALT-4091</span>
+                <span class="alert-sep">•</span>
+                <span class="alert-severity">YÜKSEK</span>
+              </span>
+              <span class="pixel-badge badge-unclaimed" id="badge-q1">UNCLAIMED</span>
+            </div>
+            <h3 class="alert-title">Şüpheli PowerShell EncodedCommand</h3>
+          </div>
+          <p class="alert-log">HOST: MUHASEBE-PC12 | KULLANICI: m.yilmaz | İMZA: Base64 İndirme Komutu</p>
+          <div class="alert-footer" id="footer-q1">
+            <span class="unassigned-label">Atanan analist yok</span>
+            <button type="button" class="px-btn px-btn-cyan" data-toggle-claim="q1">[CLAIM]</button>
+          </div>
+        </article>
+
+        <!-- Card 2: Claimed -->
+        <article class="alert-card state-claimed" id="card-q2" data-claimed="true">
+          <div>
+            <div class="alert-top-row">
+              <span class="alert-meta">
+                <span class="alert-code">ALT-4088</span>
+                <span class="alert-sep">•</span>
+                <span class="alert-severity">KRİTİK</span>
+              </span>
+              <span class="pixel-badge badge-claimed" id="badge-q2">CLAIMED BY ALİ</span>
+            </div>
+            <h3 class="alert-title">Dış C2 Sinyali → 185.220.101.44</h3>
+          </div>
+          <p class="alert-log">HOST: API-GW-02 | PORT: 4444/TCP | 142 KB/dk Periyodik Beacon Trafiği</p>
+          <div class="alert-footer" id="footer-q2">
+            <div class="assignee-chip">
+              <div class="avatar-box">
+                <img src="assets/sprites/analyst-ali.png" alt="Analist Ali 16x16 piksel avatar">
+              </div>
+              <div>
+                <div class="assignee-name">ALİ K.</div>
+                <div class="assignee-role">Üstlenildi</div>
+              </div>
+            </div>
+            <button type="button" class="px-btn px-btn-amber" data-toggle-claim="q2">[RELEASE]</button>
+          </div>
+        </article>
+
+        <!-- Card 3: SLA Critical -->
+        <article class="alert-card state-critical" id="card-q3">
+          <div>
+            <div class="alert-top-row">
+              <span class="alert-meta">
+                <span class="alert-code">ALT-4082</span>
+                <span class="alert-sep">•</span>
+                <span class="alert-severity">SLA İHLALİ</span>
+              </span>
+              <span class="pixel-badge badge-critical">
+                <span class="pixel-led pixel-led-red"></span>
+                SLA CRITICAL
+              </span>
+            </div>
+            <h3 class="alert-title">LSASS Kimlik Bilgisi Dökümü (DC-01)</h3>
+          </div>
+          <p class="alert-log">HOST: AD-DC-01 | SÜREÇ: rundll32.exe → lsass.exe | Acil Müdahale Gerekli!</p>
+          <div class="alert-footer">
+            <div class="sla-timer-box">
+              <div class="avatar-box" style="border-color: var(--threat);">
+                <img src="assets/sprites/alarm-siren.png" alt="Kırmızı Alarm Sireni">
+              </div>
+              <div>
+                <div class="sla-label">KALAN SLA</div>
+                <div class="sla-countdown" id="sla-countdown">00:25</div>
+              </div>
+            </div>
+            <button type="button" id="btn-reset-sla" class="px-btn px-btn-threat">Süreyi Sıfırla</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- 3. ETKİLEŞİMLİ DAMGA MASASI (PAPERS, PLEASE HİSSİ) -->
+    <section id="section-triage" class="pixel-panel" aria-label="Etkileşimli Damga Masası">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-tag">03</span>
+          <div>
+            <h2 class="section-title">Etkileşimli Damga Masası</h2>
+            <p class="section-sub">Enrichment araçlarıyla kanıt topla, ardından vaka kağıdına karar mührünü bas.</p>
+          </div>
+        </div>
+        <button type="button" id="btn-clear-dossier" class="px-btn">Dosyayı Temizle</button>
+      </div>
+
+      <div class="desk-layout">
+        <div class="dossier-paper" id="dossier-paper">
+          <div class="dossier-header">
+            <span class="dossier-heading">
+              <span class="dossier-label">DOSYA NO:</span>
+              <span class="dossier-code">INC-2026-0842</span>
+            </span>
+            <span class="pixel-badge badge-unclaimed" id="dossier-status">İNCELEME BEKLİYOR</span>
+          </div>
+
+          <div class="dossier-log-box">
+            <div><span class="dossier-kv">[ALARM]</span> FIN-SRV-04 Üzerinde Anormal Kerberoasting &amp; Süreç Enjeksiyonu</div>
+            <div><span class="dossier-kv">[KAYNAK IP]</span> 91.214.124.77 (Yüksek Anomali Puanı)</div>
+            <div><span class="dossier-kv">[SHA256]</span> 7f9c2e41b8a0d19e3c4412a87b6f9d22...e09a</div>
+            <div><span class="dossier-kv">[HEDEF]</span> FIN-SRV-04 (Muhasebe ERP Veritabanı)</div>
+          </div>
+
+          <div class="evidence-terminal">
+            <h3 class="evidence-title">KANIT GÜNLÜĞÜ (ENRICHMENT ÇIKTILARI)</h3>
+            <ul class="evidence-list" id="evidence-list">
+              <li class="evidence-item-empty">&gt; Henüz ek kanıt çekilmedi. Sağdaki Enrichment araçlarını kullanın.</li>
+            </ul>
+          </div>
+
+          <div id="pixel-seal" class="pixel-seal" aria-live="polite"></div>
+        </div>
+
+        <div class="desk-controls">
+          <div class="enrichment-stack">
+            <button type="button" class="px-btn px-btn-cyan enrich-btn" data-enrich="ip">
+              <span class="enrich-left">
+                <span class="enrich-icon-box">
+                  <img src="assets/sprites/tool-ip-radar.png" alt="IP İtibar" class="pixel-sprite">
+                </span>
+                <span>[IP İTİBAR]</span>
+              </span>
+              <span class="enrich-status" id="enrich-status-ip">SORGULA</span>
+            </button>
+
+            <button type="button" class="px-btn px-btn-cyan enrich-btn" data-enrich="hash">
+              <span class="enrich-left">
+                <span class="enrich-icon-box">
+                  <img src="assets/sprites/tool-hash-scanner.png" alt="Hash/VT" class="pixel-sprite">
+                </span>
+                <span>[HASH/VT]</span>
+              </span>
+              <span class="enrich-status" id="enrich-status-hash">SORGULA</span>
+            </button>
+
+            <button type="button" class="px-btn px-btn-cyan enrich-btn" data-enrich="cmdb">
+              <span class="enrich-left">
+                <span class="enrich-icon-box">
+                  <img src="assets/sprites/tool-cmdb-server.png" alt="İç CMDB" class="pixel-sprite">
+                </span>
+                <span>[İÇ CMDB]</span>
+              </span>
+              <span class="enrich-status" id="enrich-status-cmdb">SORGULA</span>
+            </button>
+          </div>
+
+          <div class="stamp-pad">
+            <p class="stamp-pad-label">KARAR MÜHRÜ (BASILDIĞINDA AŞAĞI ÇÖKER)</p>
+            <button type="button" id="btn-stamp-fp" class="px-btn px-btn-safe px-btn-stamp">
+              [FALSE POSITIVE - KAPAT]
+            </button>
+            <button type="button" id="btn-stamp-tp" class="px-btn px-btn-threat px-btn-stamp">
+              [TRUE POSITIVE - ESKALE ET]
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. BREACH METER (ŞİRKET SAĞLIĞI) -->
+    <section id="section-breach" class="pixel-panel" aria-label="Breach Meter Şirket Sağlığı">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-tag">04</span>
+          <div>
+            <h2 class="section-title">Breach Meter (Şirket Sağlığı)</h2>
+            <p class="section-sub">10 bloklu parçalı 16-bit sağlık barı: Yeşil → Kehribar → Kırmızı + ekran sarsıntısı.</p>
+          </div>
+        </div>
+        <span class="pixel-badge badge-unclaimed" id="breach-state-badge">DURUM: GÜVENLİ</span>
+      </div>
+
+      <div class="breach-panel-inner">
+        <div class="breach-top-stats">
+          <div class="breach-subtitle">
+            KURUMSAL SAVUNMA BÜTÜNLÜĞÜ (10 × 10 HP BLOK)
+          </div>
+          <div class="hp-readout" id="hp-readout">100 / 100 HP</div>
+        </div>
+
+        <div class="breach-bar" id="breach-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"></div>
+
+        <div class="breach-actions">
+          <div class="breach-btn-group">
+            <button type="button" id="btn-miss-attack" class="px-btn px-btn-threat">
+              Saldırı Kaçır (-30 HP)
+            </button>
+            <button type="button" id="btn-reset-hp" class="px-btn px-btn-safe">
+              Sıfırla
+            </button>
+          </div>
+          <span class="breach-hint" id="breach-hint">
+            İpucu: Ardışık saldırılar barı yeşilden kehribara ve kırmızıya çevirir.
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. 16x16 PİKSEL ASSET GALERİSİ -->
+    <section id="section-gallery" class="pixel-panel" aria-label="16x16 Piksel Asset Galerisi">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-tag">05</span>
+          <div>
+            <h2 class="section-title">16×16 Piksel Asset Galerisi</h2>
+            <p class="section-sub">render_sprite.py (NEAREST ×8) ile üretilen 8 şeffaf PNG + crispEdges inline SVG ikonları.</p>
+          </div>
+        </div>
+        <button type="button" id="btn-toggle-grid" class="px-btn px-btn-cyan" aria-pressed="false">
+          16×16 Izgara Göster
+        </button>
+      </div>
+
+      <div class="gallery-grid" id="gallery-grid">
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/analyst-ali.png" alt="Analist Ali 16x16 avatar">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Analist Ali</div>
+          <div class="sprite-file">analyst-ali.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/analyst-zeynep.png" alt="Analist Zeynep 16x16 avatar">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Analist Zeynep</div>
+          <div class="sprite-file">analyst-zeynep.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/analyst-kerem.png" alt="Analist Kerem 16x16 avatar">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Analist Kerem</div>
+          <div class="sprite-file">analyst-kerem.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/analyst-elif.png" alt="Analist Elif 16x16 avatar">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Analist Elif</div>
+          <div class="sprite-file">analyst-elif.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/alarm-siren.png" alt="Kırmızı Alarm Sireni 16x16 sprite">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Alarm Sireni</div>
+          <div class="sprite-file">alarm-siren.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/tool-ip-radar.png" alt="IP İtibar Radarı 16x16 ikonu">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">IP İtibar Radarı</div>
+          <div class="sprite-file">tool-ip-radar.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/tool-hash-scanner.png" alt="Hash/VT Tarayıcı 16x16 ikonu">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">Hash / VT Tarayıcı</div>
+          <div class="sprite-file">tool-hash-scanner.png</div>
+        </div>
+
+        <div class="sprite-card">
+          <div class="sprite-stage">
+            <img src="assets/sprites/tool-cmdb-server.png" alt="İç CMDB Sunucusu 16x16 ikonu">
+            <div class="pixel-grid-overlay"></div>
+          </div>
+          <div class="sprite-name">İç CMDB Sunucusu</div>
+          <div class="sprite-file">tool-cmdb-server.png</div>
+        </div>
+      </div>
+
+      <div class="svg-strip">
+        <span class="svg-strip-label">
+          INLINE 24×24 CRISP-EDGES SVG (&lt;rect&gt;-ONLY):
+        </span>
+        <div class="svg-strip-items">
+          <span class="svg-demo-chip">
+            <svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="4" y="2" width="16" height="2" fill="#2de370"/>
+              <rect x="4" y="4" width="2" height="10" fill="#2de370"/>
+              <rect x="18" y="4" width="2" height="10" fill="#2de370"/>
+              <rect x="6" y="14" width="2" height="4" fill="#2de370"/>
+              <rect x="16" y="14" width="2" height="4" fill="#2de370"/>
+              <rect x="8" y="18" width="2" height="2" fill="#2de370"/>
+              <rect x="14" y="18" width="2" height="2" fill="#2de370"/>
+              <rect x="10" y="20" width="4" height="2" fill="#2de370"/>
+              <rect x="10" y="8" width="4" height="6" fill="#2de370"/>
+            </svg>
+            Savunma Kalkanı
+          </span>
+
+          <span class="svg-demo-chip">
+            <svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="2" fill="#38d9ff"/>
+              <rect x="2" y="6" width="2" height="12" fill="#38d9ff"/>
+              <rect x="20" y="6" width="2" height="12" fill="#38d9ff"/>
+              <rect x="2" y="18" width="20" height="2" fill="#38d9ff"/>
+              <rect x="6" y="9" width="2" height="2" fill="#38d9ff"/>
+              <rect x="8" y="11" width="2" height="2" fill="#38d9ff"/>
+              <rect x="6" y="13" width="2" height="2" fill="#38d9ff"/>
+              <rect x="12" y="13" width="6" height="2" fill="#38d9ff"/>
+            </svg>
+            Terminal Log
+          </span>
+
+          <span class="svg-demo-chip">
+            <svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="6" y="2" width="12" height="2" fill="#ffb84d"/>
+              <rect x="4" y="4" width="2" height="4" fill="#ffb84d"/>
+              <rect x="18" y="4" width="2" height="4" fill="#ffb84d"/>
+              <rect x="2" y="8" width="2" height="8" fill="#ffb84d"/>
+              <rect x="20" y="8" width="2" height="8" fill="#ffb84d"/>
+              <rect x="4" y="16" width="2" height="4" fill="#ffb84d"/>
+              <rect x="18" y="16" width="2" height="4" fill="#ffb84d"/>
+              <rect x="6" y="20" width="12" height="2" fill="#ffb84d"/>
+              <rect x="11" y="7" width="2" height="6" fill="#e6ecff"/>
+              <rect x="13" y="11" width="4" height="2" fill="#e6ecff"/>
+            </svg>
+            SLA Sayacı
+          </span>
+
+          <span class="svg-demo-chip">
+            <svg viewBox="0 0 24 24" width="24" height="24" shape-rendering="crispEdges" aria-hidden="true">
+              <rect x="9" y="3" width="6" height="2" fill="#ff3864"/>
+              <rect x="8" y="5" width="8" height="4" fill="#ff3864"/>
+              <rect x="10" y="9" width="4" height="4" fill="#ffb84d"/>
+              <rect x="5" y="13" width="14" height="4" fill="#ff3864"/>
+              <rect x="4" y="19" width="16" height="2" fill="#e6ecff"/>
+            </svg>
+            Mühür Damga
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. MİNİ PROJEKTÖR ÖNİZLEMESİ (/host TADINDA) -->
+    <section id="section-host" class="pixel-panel" aria-label="Mini Projektör Önizlemesi">
+      <div class="section-head">
+        <div class="section-title-group">
+          <span class="section-tag">06</span>
+          <div>
+            <h2 class="section-title">Mini Projektör Önizlemesi (/host)</h2>
+            <p class="section-sub">Takımların canlı Breach Meter barları ve anlık SOC skor tablosu.</p>
+          </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+          <button type="button" id="btn-sim-round" class="px-btn px-btn-amber">Tur Simüle Et</button>
+          <button type="button" id="btn-reset-host" class="px-btn">Skoru Sıfırla</button>
+        </div>
+      </div>
+
+      <div class="host-projector">
+        <div class="host-banner">
+          <h3 class="host-title">
+            <span class="host-brand">BREACH<span>ZERO</span> /HOST</span>
+            <span class="host-sub">// CANLI PROJEKTÖR ÖNİZLEMESİ</span>
+          </h3>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span class="pixel-badge badge-claimed">DALGA 03 / 05</span>
+            <span class="pixel-badge badge-unclaimed">
+              <span class="pixel-led pixel-led-green"></span>
+              CANLI YAYIN
+            </span>
+          </div>
+        </div>
+
+        <div class="teams-grid" id="teams-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <div id="pixel-toast" class="pixel-toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* 1. Top Bar: Clock, Scanlines, Palette Swatches */
+      var clockEl = document.getElementById('clock-text');
+      function updateClock() {
+        var now = new Date();
+        var hh = String(now.getHours()).padStart(2, '0');
+        var mm = String(now.getMinutes()).padStart(2, '0');
+        var ss = String(now.getSeconds()).padStart(2, '0');
+        clockEl.textContent = hh + ':' + mm + ':' + ss;
+      }
+      updateClock();
+      setInterval(updateClock, 1000);
+
+      var btnScanline = document.getElementById('btn-scanline');
+      var scanlineLabel = document.getElementById('scanline-label');
+      btnScanline.addEventListener('click', function () {
+        var isOff = document.body.classList.toggle('scanlines-off');
+        var isOn = !isOff;
+        btnScanline.setAttribute('aria-pressed', String(isOn));
+        scanlineLabel.textContent = isOn ? 'CRT SCANLINE: AÇIK (HAFİF)' : 'CRT SCANLINE: KAPALI';
+      });
+
+      var toastEl = document.getElementById('pixel-toast');
+      var toastTimer = null;
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('is-visible');
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove('is-visible');
+        }, 2000);
+      }
+
+      function copyHex(hex, label) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(hex).then(function () {
+            showToast('KOPYALANDI: ' + hex + ' (' + label + ')');
+          }).catch(function () {
+            fallbackCopy(hex, label);
+          });
+        } else {
+          fallbackCopy(hex, label);
+        }
+      }
+
+      function fallbackCopy(hex, label) {
+        var ta = document.createElement('textarea');
+        ta.value = hex;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try {
+          document.execCommand('copy');
+          showToast('KOPYALANDI: ' + hex + ' (' + label + ')');
+        } catch (err) {
+          showToast('HEX: ' + hex);
+        }
+        document.body.removeChild(ta);
+      }
+
+      var paletteData = [
+        { name: 'CRT Deep', hex: '#0c0f1d' },
+        { name: 'Panel Yüzeyi', hex: '#171c33' },
+        { name: 'İkincil Kart', hex: '#232a4a' },
+        { name: 'Kenarlık Açık', hex: '#4b588a' },
+        { name: 'Kenarlık Gölge', hex: '#070912' },
+        { name: 'Ana Metin', hex: '#e6ecff' },
+        { name: 'İkincil Metin', hex: '#b2bfe8' },
+        { name: 'Güvenli / FP', hex: '#2de370' },
+        { name: 'Yeşil Koyu', hex: '#157a3b' },
+        { name: 'Tehdit / TP', hex: '#ff3864' },
+        { name: 'Kırmızı Koyu', hex: '#991636' },
+        { name: 'Uyarı / Claim', hex: '#ffb84d' },
+        { name: 'Kehribar Koyu', hex: '#9c6314' },
+        { name: 'Enrichment Camgöbeği', hex: '#38d9ff' }
+      ];
+
+      var paletteGrid = document.getElementById('palette-grid');
+      paletteData.forEach(function (item) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'swatch-card';
+        btn.title = 'Kopyalamak için tıkla: ' + item.hex;
+        btn.innerHTML =
+          '<span class="swatch-chip" style="background-color:' + item.hex + ';"></span>' +
+          '<span class="swatch-meta">' +
+          '  <span class="swatch-name">' + item.name + '</span>' +
+          '  <span class="swatch-hex">' + item.hex + '</span>' +
+          '</span>';
+        btn.addEventListener('click', function () {
+          copyHex(item.hex, item.name);
+        });
+        paletteGrid.appendChild(btn);
+      });
+
+      /* 2. Shared Alert Queue */
+      var claimProfiles = {
+        q1: { analyst: 'ZEYNEP T.', badge: 'CLAIMED BY ZEYNEP', img: 'assets/sprites/analyst-zeynep.png' },
+        q2: { analyst: 'ALİ K.', badge: 'CLAIMED BY ALİ', img: 'assets/sprites/analyst-ali.png' }
+      };
+
+      function renderClaimState(key, claimed) {
+        var card = document.getElementById('card-' + key);
+        var badge = document.getElementById('badge-' + key);
+        var footer = document.getElementById('footer-' + key);
+        var profile = claimProfiles[key];
+        card.setAttribute('data-claimed', String(claimed));
+
+        if (claimed) {
+          card.classList.add('state-claimed');
+          badge.className = 'pixel-badge badge-claimed';
+          badge.textContent = profile.badge;
+          footer.innerHTML =
+            '<div class="assignee-chip">' +
+            '  <div class="avatar-box">' +
+            '    <img src="' + profile.img + '" alt="' + profile.analyst + '">' +
+            '  </div>' +
+            '  <div>' +
+            '    <div class="assignee-name">' + profile.analyst + '</div>' +
+            '    <div class="assignee-role">Üstlenildi</div>' +
+            '  </div>' +
+            '</div>' +
+            '<button type="button" class="px-btn px-btn-amber" data-toggle-claim="' + key + '">[RELEASE]</button>';
+        } else {
+          card.classList.remove('state-claimed');
+          badge.className = 'pixel-badge badge-unclaimed';
+          badge.textContent = 'UNCLAIMED';
+          footer.innerHTML =
+            '<span class="unassigned-label">Atanan analist yok</span>' +
+            '<button type="button" class="px-btn px-btn-cyan" data-toggle-claim="' + key + '">[CLAIM]</button>';
+        }
+      }
+
+      document.getElementById('queue-grid').addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-toggle-claim]');
+        if (!btn) return;
+        var key = btn.getAttribute('data-toggle-claim');
+        var card = document.getElementById('card-' + key);
+        var isClaimed = card.getAttribute('data-claimed') === 'true';
+        renderClaimState(key, !isClaimed);
+      });
+
+      var slaSeconds = 25;
+      var slaEl = document.getElementById('sla-countdown');
+      function updateSlaDisplay() {
+        var mm = String(Math.floor(slaSeconds / 60)).padStart(2, '0');
+        var ss = String(slaSeconds % 60).padStart(2, '0');
+        slaEl.textContent = mm + ':' + ss;
+      }
+      setInterval(function () {
+        slaSeconds = slaSeconds > 0 ? slaSeconds - 1 : 25;
+        updateSlaDisplay();
+      }, 1000);
+
+      document.getElementById('btn-reset-sla').addEventListener('click', function () {
+        slaSeconds = 25;
+        updateSlaDisplay();
+      });
+
+      document.getElementById('btn-reset-queue').addEventListener('click', function () {
+        renderClaimState('q1', false);
+        renderClaimState('q2', true);
+        slaSeconds = 25;
+        updateSlaDisplay();
+        showToast('Alarm kuyruğu varsayılan 3 duruma sıfırlandı');
+      });
+
+      /* 3. Interactive Stamp Desk */
+      var evidenceList = document.getElementById('evidence-list');
+      var dossierStatus = document.getElementById('dossier-status');
+      var pixelSeal = document.getElementById('pixel-seal');
+      var enrichmentDone = { ip: false, hash: false, cmdb: false };
+
+      var enrichmentLines = {
+        ip: {
+          cls: 'evidence-item-threat',
+          text: '[IP İTİBAR] 91.214.124.77 → AbuseIPDB %96 Kötücül (Bilinen C2 Geçidi)'
+        },
+        hash: {
+          cls: 'evidence-item-warn',
+          text: '[HASH/VT] 7f9c2e41...e09a → VirusTotal: 47/72 Motor (Trojan.Kerberoast)'
+        },
+        cmdb: {
+          cls: 'evidence-item-safe',
+          text: '[İÇ CMDB] FIN-SRV-04 → Katman-1 Kritik Finans DB | Sahip: Finans Altyapı'
+        }
+      };
+
+      document.querySelectorAll('[data-enrich]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var key = btn.getAttribute('data-enrich');
+          if (enrichmentDone[key]) return;
+          enrichmentDone[key] = true;
+
+          var emptyNode = evidenceList.querySelector('.evidence-item-empty');
+          if (emptyNode) emptyNode.remove();
+
+          var li = document.createElement('li');
+          li.className = enrichmentLines[key].cls;
+          li.textContent = '> ' + enrichmentLines[key].text;
+          evidenceList.appendChild(li);
+
+          btn.classList.add('is-done');
+          document.getElementById('enrich-status-' + key).textContent = 'TAMAM';
+        });
+      });
+
+      function applyStamp(type) {
+        pixelSeal.classList.remove('is-visible', 'seal-fp', 'seal-tp');
+        void pixelSeal.offsetWidth;
+        if (type === 'fp') {
+          pixelSeal.classList.add('seal-fp', 'is-visible');
+          pixelSeal.innerHTML = 'FALSE POSITIVE<br>KAPATILDI';
+          dossierStatus.className = 'pixel-badge';
+          dossierStatus.style.backgroundColor = 'var(--safe)';
+          dossierStatus.style.color = 'var(--border-shadow)';
+          dossierStatus.style.borderColor = 'var(--safe-dark)';
+          dossierStatus.textContent = 'KAPATILDI (FP)';
+        } else {
+          pixelSeal.classList.add('seal-tp', 'is-visible');
+          pixelSeal.innerHTML = 'TRUE POSITIVE<br>ESKALE EDİLDİ';
+          dossierStatus.className = 'pixel-badge badge-critical';
+          dossierStatus.style = '';
+          dossierStatus.textContent = 'ESKALE EDİLDİ (TP)';
+        }
+      }
+
+      document.getElementById('btn-stamp-fp').addEventListener('click', function () {
+        applyStamp('fp');
+      });
+
+      document.getElementById('btn-stamp-tp').addEventListener('click', function () {
+        applyStamp('tp');
+      });
+
+      document.getElementById('btn-clear-dossier').addEventListener('click', function () {
+        enrichmentDone = { ip: false, hash: false, cmdb: false };
+        evidenceList.innerHTML =
+          '<li class="evidence-item-empty">&gt; Henüz ek kanıt çekilmedi. Sağdaki Enrichment araçlarını kullanın.</li>';
+        document.querySelectorAll('[data-enrich]').forEach(function (btn) {
+          btn.classList.remove('is-done');
+          var key = btn.getAttribute('data-enrich');
+          document.getElementById('enrich-status-' + key).textContent = 'SORGULA';
+        });
+        pixelSeal.classList.remove('is-visible', 'seal-fp', 'seal-tp');
+        dossierStatus.className = 'pixel-badge badge-unclaimed';
+        dossierStatus.style = '';
+        dossierStatus.textContent = 'İNCELEME BEKLİYOR';
+      });
+
+      /* 4. Breach Meter */
+      var hp = 100;
+      var shellEl = document.getElementById('war-room-shell');
+      var breachBarEl = document.getElementById('breach-bar');
+      var hpReadoutEl = document.getElementById('hp-readout');
+      var breachBadgeEl = document.getElementById('breach-state-badge');
+
+      function renderBreachBar(container, currentHp, blockClass) {
+        container.innerHTML = '';
+        var activeBlocks = Math.ceil(currentHp / 10);
+        var stateCls = 'active-safe';
+        if (currentHp <= 30) stateCls = 'active-threat';
+        else if (currentHp <= 60) stateCls = 'active-warn';
+
+        for (var i = 0; i < 10; i++) {
+          var blk = document.createElement('div');
+          blk.className = blockClass + (i < activeBlocks ? ' ' + stateCls : '');
+          container.appendChild(blk);
+        }
+      }
+
+      function updateMainBreachMeter() {
+        renderBreachBar(breachBarEl, hp, 'hp-block');
+        breachBarEl.setAttribute('aria-valuenow', String(hp));
+        hpReadoutEl.textContent = hp + ' / 100 HP';
+
+        hpReadoutEl.classList.remove('is-warn', 'is-threat');
+        breachBarEl.classList.remove('is-critical');
+        breachBadgeEl.style = '';
+
+        if (hp === 0) {
+          hpReadoutEl.classList.add('is-threat');
+          breachBarEl.classList.add('is-critical');
+          breachBadgeEl.className = 'pixel-badge badge-critical';
+          breachBadgeEl.textContent = 'BREACH! SİSTEM İHLAL EDİLDİ';
+        } else if (hp <= 30) {
+          hpReadoutEl.classList.add('is-threat');
+          breachBarEl.classList.add('is-critical');
+          breachBadgeEl.className = 'pixel-badge badge-critical';
+          breachBadgeEl.textContent = 'DURUM: KRİTİK İHLAL';
+        } else if (hp <= 60) {
+          hpReadoutEl.classList.add('is-warn');
+          breachBadgeEl.className = 'pixel-badge badge-claimed';
+          breachBadgeEl.textContent = 'DURUM: RİSK ALTINDA';
+        } else {
+          breachBadgeEl.className = 'pixel-badge';
+          breachBadgeEl.style.backgroundColor = 'var(--safe)';
+          breachBadgeEl.style.color = 'var(--border-shadow)';
+          breachBadgeEl.style.borderColor = 'var(--safe-dark)';
+          breachBadgeEl.textContent = 'DURUM: GÜVENLİ';
+        }
+      }
+
+      updateMainBreachMeter();
+
+      document.getElementById('btn-miss-attack').addEventListener('click', function () {
+        hp = Math.max(0, hp - 30);
+        updateMainBreachMeter();
+        shellEl.classList.remove('is-shaking', 'is-damage-flash');
+        void shellEl.offsetWidth;
+        shellEl.classList.add('is-shaking', 'is-damage-flash');
+        setTimeout(function () {
+          shellEl.classList.remove('is-shaking', 'is-damage-flash');
+        }, 380);
+      });
+
+      document.getElementById('btn-reset-hp').addEventListener('click', function () {
+        hp = 100;
+        updateMainBreachMeter();
+      });
+
+      /* 5. Gallery Grid Toggle */
+      var btnToggleGrid = document.getElementById('btn-toggle-grid');
+      var galleryGrid = document.getElementById('gallery-grid');
+      btnToggleGrid.addEventListener('click', function () {
+        var on = galleryGrid.classList.toggle('show-grid');
+        btnToggleGrid.setAttribute('aria-pressed', String(on));
+        btnToggleGrid.textContent = on ? '16×16 Izgarayı Gizle' : '16×16 Izgara Göster';
+      });
+
+      /* 6. Mini Projector Preview (/host) */
+      var initialTeams = [
+        { name: 'ALPHA SQUAD', avatar: 'assets/sprites/analyst-ali.png', score: 1450, resolved: 14, hp: 90 },
+        { name: 'SİBER KURTLAR', avatar: 'assets/sprites/analyst-zeynep.png', score: 1180, resolved: 11, hp: 50 },
+        { name: 'ZERO-DAY EKİBİ', avatar: 'assets/sprites/analyst-kerem.png', score: 840, resolved: 8, hp: 20 }
+      ];
+      var teamsState = JSON.parse(JSON.stringify(initialTeams));
+      var teamsGrid = document.getElementById('teams-grid');
+
+      function renderHostTeams() {
+        var sorted = teamsState.slice().sort(function (a, b) {
+          return b.score - a.score;
+        });
+        teamsGrid.innerHTML = '';
+
+        sorted.forEach(function (team, idx) {
+          var card = document.createElement('article');
+          card.className = 'team-card' + (idx === 0 ? ' rank-1' : '');
+
+          var hpLabelColor = team.hp <= 30 ? 'var(--threat)' : (team.hp <= 60 ? 'var(--warn)' : 'var(--safe)');
+          card.innerHTML =
+            '<div class="team-header">' +
+            '  <div class="team-identity">' +
+            '    <div class="avatar-box"><img src="' + team.avatar + '" alt="' + team.name + '"></div>' +
+            '    <div>' +
+            '      <h4 class="team-name">' + team.name + '</h4>' +
+            '      <span class="team-hp-label" style="color: ' + hpLabelColor + ';">Sağlık: ' + team.hp + ' HP</span>' +
+            '    </div>' +
+            '  </div>' +
+            '  <span class="team-rank">#' + (idx + 1) + '</span>' +
+            '</div>' +
+            '<div class="team-metrics">' +
+            '  <div class="metric-box">' +
+            '    <span class="metric-label">TOPLAM PUAN</span>' +
+            '    <span class="metric-value">' + team.score + '</span>' +
+            '  </div>' +
+            '  <div class="metric-box">' +
+            '    <span class="metric-label">ÇÖZÜLEN ALARM</span>' +
+            '    <span class="metric-value">' + team.resolved + '</span>' +
+            '  </div>' +
+            '</div>' +
+            '<div class="mini-breach-bar" data-team-bar="' + idx + '"></div>';
+
+          teamsGrid.appendChild(card);
+          var barEl = card.querySelector('[data-team-bar="' + idx + '"]');
+          renderBreachBar(barEl, team.hp, 'mini-hp-block');
+        });
+      }
+
+      renderHostTeams();
+
+      document.getElementById('btn-sim-round').addEventListener('click', function () {
+        teamsState.forEach(function (t, i) {
+          var gained = (i === 1 ? 320 : (i === 2 ? 210 : 140));
+          t.score += gained;
+          t.resolved += (i === 1 ? 3 : 2);
+          if (i === 0) t.hp = Math.max(10, t.hp - 10);
+          if (i === 2) t.hp = Math.max(0, t.hp - 10);
+        });
+        renderHostTeams();
+        showToast('Yeni dalga işlendi: /host skor tablosu güncellendi');
+      });
+
+      document.getElementById('btn-reset-host').addEventListener('click', function () {
+        teamsState = JSON.parse(JSON.stringify(initialTeams));
+        renderHostTeams();
+      });
+    })();
+  </script>
+</body>
+</html>

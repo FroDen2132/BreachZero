@@ -1,0 +1,33 @@
+{
+  "name": "Tool CMDB Server",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "L": "#8b97c7",
+    "M": "#4b588a",
+    "B": "#232a4a",
+    "P": "#171c33",
+    "G": "#2de370",
+    "C": "#38d9ff",
+    "A": "#ffb84d",
+    "R": "#ff3864"
+  },
+  "grid": [
+    "..OOOOOOOOOOOO..",
+    ".OLLLLLLLLLLLLO.",
+    ".OLBBBBBBBBBBMO.",
+    ".OLBGGPPCCCCBMO.",
+    ".OLBBBBBBBBBBMO.",
+    ".OOOOOOOOOOOOOO.",
+    ".OMBBBBBBBBBBMO.",
+    ".OMBAAPPCCCCBMO.",
+    ".OMBBBBBBBBBBMO.",
+    ".OOOOOOOOOOOOOO.",
+    ".OMBBBBBBBBBBMO.",
+    ".OMBRRPPCCCCBMO.",
+    ".OMBBBBBBBBBBMO.",
+    ".OMMMMMMMMMMMMO.",
+    "..OOBBOOOOBBOO..",
+    "..OOOO....OOOO.."
+  ]
+}

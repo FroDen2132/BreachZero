@@ -1,0 +1,108 @@
+{
+  "schema_version": "1.0",
+  "meta": {
+    "pack_id": "soc_fundamentals_v1",
+    "difficulty": "MEDIUM",
+    "estimated_wave": 1,
+    "author": "kulup-senaryo-ekibi"
+  },
+  "public_alert": {
+    "alert_id": "case_01_fp_backup",
+    "incident_code": "ALT-1001",
+    "title": "Gece 03:15 Yüksek Hacimli PowerShell ve SMB Veri Aktarımı",
+    "severity": "HIGH",
+    "timestamp_utc": "2026-11-25T03:15:12Z",
+    "sla_seconds": 90,
+    "source": {
+      "ip": "10.40.12.10",
+      "port": 51422,
+      "hostname": "BACKUP-SRV-01",
+      "vlan": "VLAN-40-INFRA"
+    },
+    "destination": {
+      "ip": "10.20.5.14",
+      "port": 445,
+      "hostname": "FIN-DB-02",
+      "vlan": "VLAN-20-FINANCE"
+    },
+    "host": {
+      "hostname": "BACKUP-SRV-01",
+      "os": "Windows Server 2022"
+    },
+    "user": {
+      "name": "svc_veeam_backup",
+      "department": "IT Altyapı"
+    },
+    "process": {
+      "name": "powershell.exe",
+      "parent_name": "Veeam.Backup.Service.exe",
+      "command_line": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:\\ProgramData\\Veeam\\Scripts\\NightlyDbSnapshot.ps1 -Target FIN-DB-02"
+    },
+    "file": {
+      "name": "NightlyDbSnapshot.ps1",
+      "sha256": "a1b2c3d4e5f678901234567890abcdef1234567890abcdef1234567890abcd01"
+    },
+    "raw_log": "2026-11-25T03:15:12Z BACKUP-SRV-01 WinEvent[4688]: Parent=Veeam.Backup.Service.exe User=CORP\\svc_veeam_backup Dest=10.20.5.14:445/SMB Transfer=4.2GB",
+    "indicators": {
+      "ips": ["10.40.12.10", "10.20.5.14"],
+      "hashes": ["a1b2c3d4e5f678901234567890abcdef1234567890abcdef1234567890abcd01"],
+      "domains": [],
+      "usernames": ["svc_veeam_backup"],
+      "hostnames": ["BACKUP-SRV-01", "FIN-DB-02"]
+    },
+    "available_enrichers": ["internal_cmdb", "hash_vt", "ip_reputation"]
+  },
+  "server_only": {
+    "ground_truth": "FP",
+    "hp_penalty_on_miss": 0,
+    "mitre_attack": [],
+    "category": "scheduled_maintenance",
+    "required_evidence_hints": ["internal_cmdb", "hash_vt"],
+    "debrief_explanation": "Bu alarm gece 03:00-04:00 arası tanımlı resmi yedekleme penceresinde üretilmiştir. Süreç ebeveyni Veeam.Backup.Service.exe, kullanılan svc_veeam_backup servis hesabı CMDB'de onaylıdır ve NightlyDbSnapshot.ps1 dosyası şirket içi dijital imzaya sahiptir (VirusTotal 0/72). İç ağdaki planlı bakım olduğu için FALSE POSITIVE olarak kapatılmalıdır.",
+    "mock_enrichment": {
+      "internal_cmdb": {
+        "enricher_id": "internal_cmdb",
+        "display_name": "İç CMDB",
+        "icon_id": "tool-cmdb-server",
+        "status": "OK",
+        "verdict_signal": "BENIGN",
+        "summary": "BACKUP-SRV-01 onaylı yedekleme sunucusu; svc_veeam_backup için 03:00-04:00 arası FIN-DB-02 bakım penceresi kayıtlı.",
+        "details": {
+          "asset_role": "Enterprise Backup Server",
+          "change_ticket": "CHG-2026-1104 (Onaylı Gece Yedekleme)",
+          "service_account_owner": "IT Altyapı Ekibi",
+          "maintenance_window": "03:00 - 04:00 UTC"
+        },
+        "source_mode": "mock"
+      },
+      "hash_vt": {
+        "enricher_id": "hash_vt",
+        "display_name": "Hash / VT",
+        "icon_id": "tool-hash-scanner",
+        "status": "OK",
+        "verdict_signal": "BENIGN",
+        "summary": "NightlyDbSnapshot.ps1 → 0/72 tespit; şirket içi PKI kodu ile imzalanmış doğrulanmış bakım betiği.",
+        "details": {
+          "detections": "0/72",
+          "signer": "CORP Internal Code Signing CA",
+          "first_seen": "2025-04-10"
+        },
+        "source_mode": "mock"
+      },
+      "ip_reputation": {
+        "enricher_id": "ip_reputation",
+        "display_name": "IP İtibar",
+        "icon_id": "tool-ip-radar",
+        "status": "OK",
+        "verdict_signal": "INFO",
+        "summary": "10.40.12.10 ve 10.20.5.14 RFC1918 dahili VLAN adresleridir; dış ağ çıkışı veya C2 eşleşmesi yok.",
+        "details": {
+          "scope": "RFC1918 Private Network",
+          "external_exposure": false,
+          "abuse_confidence": 0
+        },
+        "source_mode": "mock"
+      }
+    }
+  }
+}

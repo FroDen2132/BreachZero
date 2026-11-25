@@ -1,0 +1,34 @@
+{
+  "name": "Tool IP Radar",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "M": "#4b588a",
+    "L": "#8b97c7",
+    "D": "#0c0f1d",
+    "P": "#171c33",
+    "B": "#232a4a",
+    "C": "#38d9ff",
+    "G": "#2de370",
+    "R": "#ff3864",
+    "A": "#ffb84d"
+  },
+  "grid": [
+    "....OOOOOOOO....",
+    "..OOMMMMMMMMOO..",
+    ".OMLLDDDDDDLLMO.",
+    ".OMDDDDCCDDDDMO.",
+    "OMDDDCCCCCCDDCMO",
+    "OMDDCDDDDDCCCDMO",
+    "OMDDCDDDCCDDCDMO",
+    "OMDDCCDCCCDCCDMO",
+    "OMDDCDDCCDDDDDMO",
+    "OMDDCDDDDDCRRDMO",
+    ".OMDDCDDDDCRRDMO",
+    ".OMLLDDDDDDLLMO.",
+    "..OOMMMMMMMMOO..",
+    "....OOBBBBOO....",
+    "...OOMMMMMMOO...",
+    "...OOOOOOOOOO..."
+  ]
+}

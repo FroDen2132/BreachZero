@@ -1,0 +1,36 @@
+{
+  "name": "SOC Analyst Ali",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "H": "#1c2033",
+    "h": "#4b588a",
+    "M": "#4b588a",
+    "S": "#f1c27d",
+    "D": "#c68642",
+    "C": "#38d9ff",
+    "W": "#e6ecff",
+    "A": "#ffb84d",
+    "B": "#232a4a",
+    "P": "#171c33",
+    "G": "#2de370"
+  },
+  "grid": [
+    "....OOOOOOOO....",
+    "...OHHhHHHHHO...",
+    "..OHHHHHHHHHHO..",
+    "..OHHSSSSSSHHO..",
+    ".OMOSSSSSSSSOMO.",
+    ".OMOSOWSSOWSOMO.",
+    ".OMOSOCSSOCSOMO.",
+    ".OMOSSSSSSSSOMO.",
+    "..OMASSDDSSSOO..",
+    "....OSSSSSSO....",
+    "...OOBBSSBBOO...",
+    "..OBBPPCCPPBBO..",
+    ".OBBPPPPPPPPBBO.",
+    ".OBBPPGGPPPPBBO.",
+    ".OBBPPPPPPPPBBO.",
+    "..OOOOOOOOOOOO.."
+  ]
+}

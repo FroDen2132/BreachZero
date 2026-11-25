@@ -1,0 +1,33 @@
+{
+  "name": "Tool Hash Scanner",
+  "palette": {
+    ".": null,
+    "O": "#070912",
+    "L": "#8b97c7",
+    "M": "#4b588a",
+    "C": "#38d9ff",
+    "W": "#e6ecff",
+    "D": "#171c33",
+    "R": "#ff3864",
+    "A": "#ffb84d",
+    "K": "#9c6314"
+  },
+  "grid": [
+    "...OOOOOOOO.....",
+    "..OLLLLLLLLOO...",
+    ".OLMMCCCCMMLMO..",
+    ".OLMCWWCCCRCMO..",
+    "OMMCCDDDRRRCCMO.",
+    "OMMCDDRRRDDCCMO.",
+    "OMMCCDDRRDCCCMO.",
+    "OMMCCCCRCCCCCMO.",
+    ".OLMCCCCCCCCMO..",
+    ".OLMMCCCCMMLMO..",
+    "..OLLLLLLLLOO...",
+    "...OOOOOOOOAO...",
+    "..........OAAO..",
+    "...........OAKO.",
+    "............OKO.",
+    ".............OO."
+  ]
+}
