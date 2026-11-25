@@ -16,6 +16,6 @@
 - [ ] `cd frontend && npm run test:e2e` (Opsiyonel tam çoklu-sekme E2E testi)
 
 ## Tasarım, Veri Seti ve Kontrat Kontrol Listesi
-- [ ] **Senaryo:** `ground_truth`, `mitre_attack`, `debrief_explanation` ve `mock_enrichment` yalnızca `server_only` bloğunda tutuldu (`public_alert` içinde spoiler yok); [`docs/OPEN_SOURCE_DATASETS.md`](../docs/OPEN_SOURCE_DATASETS.md) kurallarına (canlı zararlı binary / PII yasağı) uyuldu.
+- [ ] **Senaryo:** `ground_truth`, `mitre_attack`, `debrief_explanation` ve `mock_enrichment` yalnızca `server_only` bloğunda tutuldu (`public_alert` içinde spoiler yok); [`docs/OPEN_SOURCE_DATASETS.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/OPEN_SOURCE_DATASETS.md) kurallarına (canlı zararlı binary / PII yasağı) uyuldu.
 - [ ] **Frontend (`SKILL.md`):** `border-radius: 0`, `0px` blur gölgeler, tam sayı `16×k` sprite ölçekleme, Türkçe metinlerde `Pixelify Sans` (`>= 15px`) ve loglarda `IBM Plex Mono` kurallarına uyuldu; hardcoded `localhost:8000` yok.
-- [ ] **Kontratlar & Güvenlik:** [`docs/CONTRACTS.md`](../docs/CONTRACTS.md) ve [`docs/LEARNING_HANDBOOK.md`](../docs/LEARNING_HANDBOOK.md) sınırları korundu.
+- [ ] **Kontratlar & Güvenlik:** [`docs/CONTRACTS.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/CONTRACTS.md) ve [`docs/LEARNING_HANDBOOK.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/LEARNING_HANDBOOK.md) sınırları korundu.

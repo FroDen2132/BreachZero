@@ -4,8 +4,19 @@ import { AlertQueue } from '../components/AlertQueue';
 import { BreachMeter } from '../components/BreachMeter';
 import { PixelShell } from '../components/PixelShell';
 import { ToolIcon } from '../components/ToolIcon';
-import { ANALYST_AVATARS, ENRICHER_LABELS, type DecisionType } from '../contracts/types';
+import {
+  ANALYST_AVATARS,
+  ENRICHER_LABELS,
+  type AlertEndpoint,
+  type DecisionType,
+} from '../contracts/types';
 import { getStoredSession, useRoomSocket } from '../hooks/useRoomSocket';
+
+function formatEndpoint(ep: AlertEndpoint): string {
+  const addr = ep.ip ? (ep.port != null ? `${ep.ip}:${ep.port}` : ep.ip) : '';
+  if (ep.hostname && addr) return `${ep.hostname} (${addr})`;
+  return ep.hostname || addr || 'Bilinmiyor';
+}
 
 export const PlayPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -351,7 +362,10 @@ export const PlayPage: React.FC = () => {
               selectedAlertId={selectedAlertId}
               teamBreached={Boolean(myTeam?.is_breached) || isRoomPaused}
               onSelect={setSelectedAlertId}
-              onClaim={(aid) => sendAction('CLAIM_ALERT', { alert_id: aid })}
+              onClaim={(aid) => {
+                setSelectedAlertId(aid);
+                sendAction('CLAIM_ALERT', { alert_id: aid });
+              }}
               onRelease={(aid) => sendAction('RELEASE_ALERT', { alert_id: aid })}
             />
           </section>
@@ -382,10 +396,13 @@ export const PlayPage: React.FC = () => {
                       className="pixel-seal absolute top-4 right-4 z-10 pointer-events-none"
                       style={{
                         color:
-                          lastDecision?.alert_id === activeAlert.alert_id &&
-                          lastDecision.outcome.includes('FALSE_NEGATIVE')
-                            ? '#ff3864'
-                            : '#2de370',
+                          lastDecision?.alert_id === activeAlert.alert_id
+                            ? lastDecision.outcome === 'CORRECT_TP' || lastDecision.outcome === 'CORRECT_FP'
+                              ? '#2de370'
+                              : lastDecision.outcome === 'FALSE_POSITIVE'
+                                ? '#ffb84d'
+                                : '#ff3864'
+                            : '#38d9ff',
                       }}
                     >
                       {lastDecision?.alert_id === activeAlert.alert_id
@@ -399,11 +416,11 @@ export const PlayPage: React.FC = () => {
                   <div className="bg-[#0c0f1d] border-2 border-[#4b588a] p-3 font-log-mono text-[#e6ecff] flex flex-col gap-1">
                     <div>
                       <span className="text-[#38d9ff] font-semibold">[KAYNAK]</span>{' '}
-                      {activeAlert.source.hostname} ({activeAlert.source.ip}:{activeAlert.source.port})
+                      {formatEndpoint(activeAlert.source)}
                     </div>
                     <div>
                       <span className="text-[#38d9ff] font-semibold">[HEDEF]</span>{' '}
-                      {activeAlert.destination.hostname} ({activeAlert.destination.ip}:{activeAlert.destination.port})
+                      {formatEndpoint(activeAlert.destination)}
                     </div>
                     <div>
                       <span className="text-[#38d9ff] font-semibold">[KULLANICI]</span>{' '}

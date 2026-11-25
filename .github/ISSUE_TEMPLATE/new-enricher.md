@@ -7,7 +7,7 @@ assignees: []
 ---
 
 ## Eklenti Kimliği ve Kontratı
-> Referans: [`docs/CONTRACTS.md`](../../docs/CONTRACTS.md) ve [`docs/LEARNING_HANDBOOK.md`](../../docs/LEARNING_HANDBOOK.md)
+> Referans: [`docs/CONTRACTS.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/CONTRACTS.md) ve [`docs/LEARNING_HANDBOOK.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/LEARNING_HANDBOOK.md)
 - **`enricher_id`:** (örn. `hash_vt`, `whois`, `dns_passive`)
 - **`display_name` (UI Buton Etiketi):** (örn. `Hash / VT`, `WHOIS`)
 - **`supported_ioc_types`:** `ip` | `hash` | `domain` | `hostname` | `username`

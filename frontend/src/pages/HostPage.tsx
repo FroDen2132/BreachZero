@@ -82,7 +82,9 @@ export const HostPage: React.FC = () => {
                       ? '#2de370'
                       : roomState.status === 'PAUSED'
                         ? '#ffb84d'
-                        : '#ff3864',
+                        : roomState.status === 'LOBBY'
+                          ? '#38d9ff'
+                          : '#ff3864',
                   color: roomState.status === 'ENDED' ? '#e6ecff' : '#070912',
                 }}
               >

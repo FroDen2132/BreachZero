@@ -14,7 +14,7 @@ assignees: []
 - **TP Kaçırma Cezası (`hp_penalty_on_miss`):** `0` (FP) / `30` (Standart TP) / `40` (Kritik TP)
 
 ## Açık Kaynak Veri Seti & IOC Detayları
-> Rehber: [`docs/OPEN_SOURCE_DATASETS.md`](../../docs/OPEN_SOURCE_DATASETS.md) (Issue açıklamasında zararlı URL/IP'leri defang edin: `185[.]220[.]101[.]44`, `hxxp://...`)
+> Rehber: [`docs/OPEN_SOURCE_DATASETS.md`](https://github.com/FroDen2132/BreachZero/blob/main/docs/OPEN_SOURCE_DATASETS.md) (Issue açıklamasında zararlı URL/IP'leri defang edin: `185[.]220[.]101[.]44`, `hxxp://...`)
 - **Referans Kaynak (SigmaHQ / OTRF Mordor / Attack Data / MalwareBazaar / ThreatFox):**
 - **Ham Log Özeti (`raw_log`):**
 - **Kullanılacak IOC'ler:** IP / SHA256 Hash / Domain / Kullanıcı / Hostname
