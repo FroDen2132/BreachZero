@@ -11,6 +11,7 @@ from app.cache.sqlite_cache import SqliteIocCache
 from app.core.scoring import ENRICHER_QUERY_COST
 from app.enrichers.base import BaseEnricher
 from app.enrichers.ip_reputation import IpReputationEnricher
+from app.enrichers.whois import WhoisEnricher
 from app.models.contracts import EvidenceCard, IocType, ScenarioFile
 
 logger = logging.getLogger("breachzero.enrichers")
@@ -54,6 +55,7 @@ class EnricherRegistry:
         self.cache = cache
         self._plugins: dict[str, BaseEnricher] = {}
         self.register(IpReputationEnricher())
+        self.register(WhoisEnricher())
 
     def register(self, plugin: BaseEnricher) -> None:
         self._plugins[plugin.enricher_id] = plugin
