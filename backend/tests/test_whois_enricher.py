@@ -93,3 +93,45 @@ def test_timeout_returns_unavailable_zero_cost() -> None:
     card = _enrich(handler, "ip", "8.8.8.8")
     assert card.status == "UNAVAILABLE"
     assert card.query_cost_applied == 0
+
+
+def test_internal_domain_makes_no_external_request() -> None:
+    calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json={})
+
+    for name in ("ad-dc-01.corp.local", "localhost", "fileserver.internal"):
+        card = _enrich(handler, "domain", name)
+        assert card.status == "OK"
+        assert card.verdict_signal == "INFO"
+    assert calls == []
+
+
+def test_malformed_domain_is_rejected_without_request() -> None:
+    calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json={})
+
+    for bad in ("evil.com/../ip/1.1.1.1", "a.com?x=1", "evil.com#frag", "a b.com", ""):
+        card = _enrich(handler, "domain", bad)
+        assert card.status == "UNAVAILABLE"
+        assert card.query_cost_applied == 0
+    assert calls == []
+
+
+def test_non_global_ips_make_no_external_request() -> None:
+    calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        calls.append(request)
+        return httpx.Response(200, json={})
+
+    for ip in ("10.0.0.5", "172.16.4.4", "127.0.0.1", "169.254.1.1", "100.64.0.1", "224.0.0.1"):
+        card = _enrich(handler, "ip", ip)
+        assert card.status == "OK"
+        assert card.verdict_signal == "INFO"
+    assert calls == []

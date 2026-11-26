@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ipaddress
+import re
 from datetime import datetime, timezone
 from typing import Any, Optional
 
@@ -13,6 +14,28 @@ from app.models.contracts import EvidenceCard, IocType
 
 RDAP_BASE_URL = "https://rdap.org"
 YOUNG_DOMAIN_DAYS = 30
+
+# ioc_value is client-controlled (RUN_ENRICHER), so it must be validated before it is
+# placed in an outbound URL: no path/query injection and no internal names leaked.
+_DOMAIN_RE = re.compile(r"^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9-]{2,63}$")
+_SINGLE_LABEL_RE = re.compile(r"^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$")
+_INTERNAL_SUFFIXES = (
+    "local", "localhost", "internal", "lan", "corp", "home", "intranet", "home.arpa", "test", "invalid",
+)
+
+
+def _normalize_domain(value: str) -> Optional[str]:
+    """Return an ASCII (punycode) lowercase domain, or None if it is not a plausible FQDN."""
+    candidate = value.strip().lower().rstrip(".")
+    try:
+        candidate = candidate.encode("idna").decode("ascii")
+    except UnicodeError:
+        return None
+    return candidate if _DOMAIN_RE.match(candidate) else None
+
+
+def _is_internal_domain(domain: str) -> bool:
+    return any(domain == suf or domain.endswith("." + suf) for suf in _INTERNAL_SUFFIXES)
 
 
 def _parse_event_date(events: list[dict[str, Any]], action: str) -> Optional[datetime]:
@@ -84,8 +107,8 @@ class WhoisEnricher(BaseEnricher):
                 ip_obj = ipaddress.ip_address(value)
             except ValueError:
                 return self._unavailable(f"'{value}' geçerli bir IP adresi değil; WHOIS sorgusu yapılmadı.")
-            # Never leak internal addresses to an external RDAP server.
-            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local:
+            # Never leak internal/non-routable addresses to an external RDAP server.
+            if not ip_obj.is_global or ip_obj.is_multicast:
                 return self._card(
                     status="OK",
                     verdict_signal="INFO",
@@ -96,7 +119,22 @@ class WhoisEnricher(BaseEnricher):
                 )
             url = f"{RDAP_BASE_URL}/ip/{value}"
         elif ioc_type == "domain":
-            url = f"{RDAP_BASE_URL}/domain/{value.lower().rstrip('.')}"
+            domain = _normalize_domain(value)
+            if domain is None and _SINGLE_LABEL_RE.match(value.strip().lower().rstrip(".")):
+                domain = value.strip().lower().rstrip(".")  # single-label hostname, e.g. "dc01"
+            if domain is None:
+                return self._unavailable("Geçerli bir alan adı değil; WHOIS sorgusu yapılmadı.")
+            if "." not in domain or _is_internal_domain(domain):
+                return self._card(
+                    status="OK",
+                    verdict_signal="INFO",
+                    summary=f"{domain} dahili bir alan adıdır; dış WHOIS kaydı yoktur.",
+                    details={"scope": "Internal Domain"},
+                    query_cost_applied=self.query_cost,
+                    source_mode="live",
+                )
+            value = domain
+            url = f"{RDAP_BASE_URL}/domain/{domain}"
         else:
             return self._unavailable(f"WHOIS '{ioc_type}' tipini desteklemiyor.")
 
@@ -115,7 +153,7 @@ class WhoisEnricher(BaseEnricher):
                     verdict_signal="INFO",
                     summary=f"{value} için RDAP kaydı bulunamadı.",
                     details={},
-                    query_cost_applied=self.query_cost,
+                    query_cost_applied=0,
                     source_mode="live",
                 )
             resp.raise_for_status()
